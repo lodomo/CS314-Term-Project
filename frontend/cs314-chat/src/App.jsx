@@ -1,18 +1,23 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./components/Login";
-import ChatRoomList from "./components/ChatRoomList";
-import ChatRoom from "./components/ChatRoom";
+import "./App.css";
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import LoginPage from "./components/loginPage";
+import Chats from "./components/chats";
+import { ChakraProvider } from "@chakra-ui/react";
 
-function App() {
+const App = () => {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/chat" element={<ChatRoomList />} />
-        <Route path="/chat/:roomName" element={<ChatRoom />} />
-      </Routes>
-    </BrowserRouter>
+    <Router>
+      <ChakraProvider>
+        <div className="App">
+          <Routes>
+            <Route path="/" element={<LoginPage />} />
+            <Route path="/chats" element={<Chats />} />
+          </Routes>
+        </div>
+      </ChakraProvider>
+    </Router>
   );
-}
+};
 
 export default App;

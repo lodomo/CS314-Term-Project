@@ -1,11 +1,12 @@
 import React from "react";
 import { useState } from "react";
-import { VStack } from "@chakra-ui/react";
-import { FormControl } from "@chakra-ui/react";
-import { Input } from "@chakra-ui/react";
-import { Button } from "@chakra-ui/react";
+import { Button } from "@chakra-ui/button";
+import { FormControl } from "@chakra-ui/form-control";
+import { Input } from "@chakra-ui/input";
+import { VStack } from "@chakra-ui/layout";
 
-const Login = () => {
+const Signup = () => {
+  const [name, setName] = useState();
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
 
@@ -13,6 +14,12 @@ const Login = () => {
 
   return (
     <VStack spacing="5px">
+      <FormControl id="first-name">
+        <Input
+          placeholder="Username here"
+          onChange={(e) => setName(e.target.value)}
+        />
+      </FormControl>
       <FormControl id="email">
         <Input
           type="email"
@@ -39,4 +46,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;

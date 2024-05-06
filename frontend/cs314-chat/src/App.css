@@ -1,36 +1,7 @@
-/* App.css */
-
-/* Global styles */
-body {
-  font-family: "Arial", sans-serif;
-  background-color: #ffffff;
-  margin: 0;
-  padding: 20px;
-}
-
-/* Component specific styles */
-.login-container {
-  padding: 20px;
-  background-color: #70c6f1;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  text-align: center;
+.App {
+  min-height: 100vh;
   display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.login-button {
-  background-color: #4285f4;
-  color: white;
-  border: none;
-  border-radius: 3px;
-  padding: 10px 15px;
-  cursor: pointer;
-  font-size: 16px;
-  text-align: center;
-}
-
-.login-button:hover {
-  background-color: #357ae8;
+  background-image: url(./assets/Portland-State-University-rosa-say.jpg.webp);
+  background-position: center;
+  background-size: cover;
 }
