@@ -15,6 +15,7 @@ import Login from "./login.jsx";
 import Signup from "./signup.jsx";
 
 const LoginPage = () => {
+  /*
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,6 +25,7 @@ const LoginPage = () => {
       navigate("/chats");
     }
   }, [navigate]);
+  */
   return (
     <Container centerContent maxW="xl">
       <Box
