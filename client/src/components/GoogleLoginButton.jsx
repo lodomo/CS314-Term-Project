@@ -4,7 +4,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 import { decodeJwt } from 'jose';
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL + '/api/login';
+const apiURL = import.meta.env.VITE_API_URL + '/api/login';
 
 const GoogleLoginButton = () => {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const GoogleLoginButton = () => {
 
     // Send the user data to the backend
     try {
-      const res = await axios.post(backendUrl, {
+      const res = await axios.post(apiURL, {
         token: jwt,
         name: decoded.name,
         email: decoded.email,

@@ -11,6 +11,7 @@ dotenv.config();
 
 const MONGO_URI = process.env.MONGO_URI;
 const CLIENT_URL = process.env.CLIENT_URL;
+const PORT = process.env.PORT;
 
 mongoose.connect(MONGO_URI);
 
@@ -56,4 +57,4 @@ app.post("/api/login", async (req, res) => {
     }
 });
 
-app.listen(4000);
+app.listen(PORT);
