@@ -58,3 +58,6 @@ app.post("/api/login", async (req, res) => {
 });
 
 app.listen(PORT);
+
+// Print the address of the server to the terminal
+console.log(`Server running at http://localhost:${PORT}/`);
