@@ -13,7 +13,7 @@
     - Downloaded the installer from the official website.
     - Version for this project is 2.34.1
 
-4) Created a MondoDB Database
+4) Created a MondoDB Databa:se
     - URI needs to be added to the .env file
 
 5) Created a GitHub Repository
@@ -50,3 +50,10 @@ Then clear out all the CSS delete App.css as its redundant, setup tailwind in th
     - yarn add axios react-router-dom 
     - yarn add jose (for jwt token)
     - yarn add cors (for cross origin resource sharing)
+
+7) sending user to the database
+    - After the user signs in it sends the google data to the backend
+    - That gets parsed into email, name, token, picture
+    - yarn add mongoose
+    - create mongoose schema for user
+
