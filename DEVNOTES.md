@@ -38,4 +38,15 @@ Then clear out all the CSS delete App.css as its redundant, setup tailwind in th
 4) Setup google authenticator.
     - Created a google authenticator project with the school email address
     - yarn add @react-oauth/google
-    - 
+    - Setup pages for signin button
+
+5) Setup api
+    - create api folder
+    - yarn add express mongoose
+    - yarn add nodemon --dev
+    - yarn add dotenv
+
+6) Send user info to the backend
+    - yarn add axios react-router-dom 
+    - yarn add jose (for jwt token)
+    - yarn add cors (for cross origin resource sharing)
