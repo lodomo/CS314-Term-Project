@@ -6,7 +6,7 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "client": "cd client && yarn dev",
-        "api": "npx nodemon ./api/index.js"
+        "api": "cd api && npx nodemon index.js"
     },
     "author": "Lorenzo Moon / Josue Lopez",
     "license": "ISC"

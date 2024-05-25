@@ -57,3 +57,5 @@ Then clear out all the CSS delete App.css as its redundant, setup tailwind in th
     - yarn add mongoose
     - create mongoose schema for user
 
+8) Fix changing URLS. Users should only see 1 url
+    :
