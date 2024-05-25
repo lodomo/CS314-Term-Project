@@ -58,4 +58,12 @@ Then clear out all the CSS delete App.css as its redundant, setup tailwind in th
     - create mongoose schema for user
 
 8) Fix changing URLS. Users should only see 1 url
-    :
+
+9) Users go to a chat page now.
+
+10) Setup websockets
+    - yarn add ws
+
+11) I didnt make notes... Users can send messages to a chatroom now.
+    It's kinda broken it doesnt load right away and doesnt show the users name
+    until you refresh the page.

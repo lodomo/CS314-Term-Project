@@ -1,34 +1,122 @@
 import React from "react";
+import { useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import ChatroomList from "./components/ChatroomList";
+import { useAuth } from "./context/AuthContext";
+import axios from "axios";
+
+const API_IP = import.meta.env.VITE_API_IP;
+const API_URL = import.meta.env.VITE_API_URL;
 
 const Chat = () => {
     const navigate = useNavigate();
+    const [ws, setWs] = useState(null);
     const location = useLocation();
-    //const { name } = location.state;
+    const [selectedChatroom, setSelectedChatroom] = useState(null);
+    const [messages, setMessages] = useState([]);
+    const [newMessage, setNewMessage] = useState("");
+    const { user } = useAuth();
 
     const handleLogout = () => {
         // Clear the state and navigate to the login page
         navigate("/", { state: { name: null } });
     };
 
+    useEffect(() => {
+        const ws = new WebSocket("ws://" + API_IP);
+        setWs(ws);
+        ws.addEventListener("message", handleMessage);
+    }, []);
+
+    useEffect(() => {
+        if (selectedChatroom) {
+            // Fetch messages for the selected chatroom
+            fetchMessages(selectedChatroom._id);
+        }
+    }, [selectedChatroom]);
+
+    const fetchMessages = async (chatroomId) => {
+        try {
+            const res = await axios.get(
+                `${import.meta.env.VITE_API_URL}/api/chatroom/${chatroomId}/messages`,
+            );
+            setMessages(res.data);
+        } catch (error) {
+            console.error("Error fetching messages:", error);
+        }
+    };
+
+    const handleSendMessage = async () => {
+        if (!newMessage.trim()) return;
+
+        try {
+            const res = await axios.post(
+                `${import.meta.env.VITE_API_URL}/api/chatroom/${selectedChatroom._id}/messages`,
+                {
+                    content: newMessage,
+                    senderId: user._id,
+                },
+            );
+
+            setMessages([...messages, res.data]);
+            setNewMessage("");
+        } catch (error) {
+            console.error("Error sending message:", error);
+        }
+    };
+
+    function handleMessage(e) {
+        console.log("new message", e);
+    }
+
     return (
         <div className="flex h-screen">
             <div className="ActiveChats bg-slate-600 w-1/3">
-                CHATS HERE 
-                TODO GET CHATS
+                <button
+                    onClick={handleLogout}
+                    className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                >
+                    Logout
+                </button>
+                <ChatroomList onChatroomSelect={setSelectedChatroom} />
             </div>
 
             <div className="Conversations flex flex-col bg-slate-700 w-2/3 p-2">
-                <div className="flex-grow bg-slate-400 p-2 rounded-lg" >
-                    messages
+                <div className="flex-grow bg-slate-400 p-2 rounded-lg">
+                    {selectedChatroom ? (
+                        <>
+                            <h2 className="text-2xl font-bold mb-4">
+                                {selectedChatroom.name}
+                            </h2>
+                            <div>
+                                {messages.map((message, index) => (
+                                    <div
+                                        key={index}
+                                        className="bg-white p-2 mb-2 rounded"
+                                    >
+                                        <strong>{message.sender.name}:</strong>{" "}
+                                        {message.content}
+                                    </div>
+                                ))}
+                            </div>
+                        </>
+                    ) : (
+                        <p>Select a chatroom to view messages</p>
+                    )}
                 </div>
-                <div className="InputArea flex gap-2 mt-2" >
+                <div className="InputArea flex gap-2 mt-2">
                     <input
                         type="text"
                         placeholder="..."
                         className="bg-slate-500 flex-grow p-2 rounded-lg text-white text-bold"
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
                     />
-                    <button className="bg-slate-400 p-2 rounded-lg" >
+                    <button
+                        className="bg-slate-400 p-2 rounded-lg"
+                        onClick={handleSendMessage}
+                    >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -43,7 +131,7 @@ const Chat = () => {
                                 d="m15 11.25-3-3m0 0-3 3m3-3v7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                             />
                         </svg>
-                    </button>
+                    </button>{" "}
                 </div>
             </div>
         </div>

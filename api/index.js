@@ -3,10 +3,12 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const app = express();
+const ws = require("ws");
 
 const mongoose = require("mongoose");
 const User = require("./models/User");
 const Chatroom = require("./models/Chatroom");
+const Message = require("./models/Message");
 
 dotenv.config();
 
@@ -28,18 +30,23 @@ app.use(bodyParser.json());
 
 // Function to ensure the "main" chatroom exists
 const ensureMainChatroomExists = async () => {
-  try {
-    const mainChatroom = await Chatroom.findOne({ name: 'main' });
-    if (!mainChatroom) {
-      const newChatroom = new Chatroom({ name: 'main', users: [], admin: null, messages: [] });
-      await newChatroom.save();
-      console.log('Main chatroom created');
-    } else {
-      console.log('Loading Main chatroom');
+    try {
+        const mainChatroom = await Chatroom.findOne({ name: "main" });
+        if (!mainChatroom) {
+            const newChatroom = new Chatroom({
+                name: "main",
+                users: [],
+                admin: null,
+                messages: [],
+            });
+            await newChatroom.save();
+            console.log("Main chatroom created");
+        } else {
+            console.log("Loading Main chatroom");
+        }
+    } catch (error) {
+        console.error("Error ensuring main chatroom exists:", error);
     }
-  } catch (error) {
-    console.error('Error ensuring main chatroom exists:', error);
-  }
 };
 
 // Call the function to ensure the main chatroom exists on server start
@@ -59,7 +66,7 @@ app.post("/api/login", async (req, res) => {
         if (!user) {
             user = new User({ name, email, picture });
             await user.save();
-            
+
             status_message = "New user created";
         } else {
             status_message = "User Logged In";
@@ -69,7 +76,7 @@ app.post("/api/login", async (req, res) => {
 
         res.json({
             message: status_message,
-            user: { name, email, picture },
+            user,
         });
     } catch (error) {
         console.error("Error processing user data:", error);
@@ -79,17 +86,68 @@ app.post("/api/login", async (req, res) => {
     // Make sure the user is added to the main chatroom
     try {
         let user = await User.findOne({ email });
-        const mainChatroom = await Chatroom.findOne({ name: 'main' });
+        const mainChatroom = await Chatroom.findOne({ name: "main" });
         if (!mainChatroom.users.includes(user._id)) {
             mainChatroom.users.push(user._id);
             await mainChatroom.save();
         }
     } catch (error) {
-        console.error('Error adding user to main chatroom:', error);
+        console.error("Error adding user to main chatroom:", error);
     }
 });
 
-app.listen(PORT);
+app.get('/api/user/:userId/chatrooms', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const chatrooms = await Chatroom.find({ users: userId }).populate('users').populate('admin').populate('messages');
+    console.log('Fetched chatrooms:', chatrooms); // Debug log to verify the response
+    res.json(chatrooms);
+  } catch (error) {
+    console.error('Error fetching chatrooms for user:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
-// Print the address of the server to the terminal
+// New endpoint to get messages for a chatroom
+app.get('/api/chatroom/:chatroomId/messages', async (req, res) => {
+  try {
+    const { chatroomId } = req.params;
+    const messages = await Message.find({ chatroom: chatroomId }).populate('sender');
+    res.json(messages);
+  } catch (error) {
+    console.error('Error fetching messages for chatroom:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// New endpoint to create a message
+app.post('/api/chatroom/:chatroomId/messages', async (req, res) => {
+  try {
+    const { chatroomId } = req.params;
+    const { content, senderId } = req.body;
+
+    const message = new Message({
+      content,
+      sender: senderId,
+      chatroom: chatroomId,
+    });
+
+    await message.save();
+
+    res.json(message);
+  } catch (error) {
+    console.error('Error creating message:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+const server = app.listen(PORT);
 console.log(`Server running at http://localhost:${PORT}/`);
+
+const wss = new ws.Server({ server });
+
+wss.on("connection", (connection, req) => {
+    console.log("Client connected");
+    connection.send("Hello from the server");
+    //console.log(req.headers);
+});

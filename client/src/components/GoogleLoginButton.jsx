@@ -29,12 +29,14 @@ const GoogleLoginButton = () => {
             });
 
             console.log("Backend Response:", res.data);
+
+            const userData = res.data.user;
             
             // Set the user data in the context
-            login({ name: decoded.name, email: decoded.email, picture: decoded.picture });
+            login(userData);
 
             // Navigate to the welcome page with the user name
-            navigate("/chat", { state: { name: decoded.name } });
+            navigate("/chat");
         } catch (error) {
             console.error("Error sending data to backend:", error);
         }
