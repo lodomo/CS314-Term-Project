@@ -6,6 +6,7 @@ const app = express();
 
 const mongoose = require("mongoose");
 const User = require("./models/User");
+const Chatroom = require("./models/Chatroom");
 
 dotenv.config();
 
@@ -24,6 +25,25 @@ app.use(
 
 // Use body-parser middleware to parse JSON requests
 app.use(bodyParser.json());
+
+// Function to ensure the "main" chatroom exists
+const ensureMainChatroomExists = async () => {
+  try {
+    const mainChatroom = await Chatroom.findOne({ name: 'main' });
+    if (!mainChatroom) {
+      const newChatroom = new Chatroom({ name: 'main', users: [], admin: null, messages: [] });
+      await newChatroom.save();
+      console.log('Main chatroom created');
+    } else {
+      console.log('Loading Main chatroom');
+    }
+  } catch (error) {
+    console.error('Error ensuring main chatroom exists:', error);
+  }
+};
+
+// Call the function to ensure the main chatroom exists on server start
+ensureMainChatroomExists();
 
 app.get("/", (req, res) => {
     res.json("You do not belong here");
@@ -54,6 +74,18 @@ app.post("/api/login", async (req, res) => {
     } catch (error) {
         console.error("Error processing user data:", error);
         res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    // Make sure the user is added to the main chatroom
+    try {
+        let user = await User.findOne({ email });
+        const mainChatroom = await Chatroom.findOne({ name: 'main' });
+        if (!mainChatroom.users.includes(user._id)) {
+            mainChatroom.users.push(user._id);
+            await mainChatroom.save();
+        }
+    } catch (error) {
+        console.error('Error adding user to main chatroom:', error);
     }
 });
 
