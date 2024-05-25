@@ -47,7 +47,7 @@ Then clear out all the CSS delete App.css as its redundant, setup tailwind in th
     - yarn add dotenv
 
 6) Send user info to the backend
-    - yarn add axios react-router-dom 
+    - yarn add axios react-router-dom
     - yarn add jose (for jwt token)
     - yarn add cors (for cross origin resource sharing)
 
@@ -67,3 +67,9 @@ Then clear out all the CSS delete App.css as its redundant, setup tailwind in th
 11) I didnt make notes... Users can send messages to a chatroom now.
     It's kinda broken it doesnt load right away and doesnt show the users name
     until you refresh the page.
+
+12) Added a way to add chatrooms.
+    Chat rooms are all independant
+
+TODO add users to chatrooms. delete owned rooms.
+

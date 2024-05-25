@@ -89,7 +89,10 @@ const Chat = () => {
     return (
         <div className="flex h-screen">
             <div className="Sidebar flex flex-col bg-slate-600 w-1/3">
-                <div className="ActiveChats flex-grow bg-slate-600">
+                <div className="Logo w-3/4 justify-center mx-auto mt-4"> 
+                    <img src="/full.svg" alt="logo" />
+                </div>
+               <div className="ActiveChats flex-grow bg-slate-600">
                     <ChatroomList onChatroomSelect={setSelectedChatroom} />
                 </div>
                 <div className="Logout flex justify-center m-2">
