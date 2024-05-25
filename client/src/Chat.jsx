@@ -46,9 +46,9 @@ const Chat = () => {
         }
     }, [selectedChatroom]);
 
-        useEffect(() => {
+    useEffect(() => {
         if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+            messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
         }
     }, [messages]);
 
@@ -88,14 +88,18 @@ const Chat = () => {
 
     return (
         <div className="flex h-screen">
-            <div className="ActiveChats bg-slate-600 w-1/3">
-                <button
-                    onClick={handleLogout}
-                    className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                >
-                    Logout
-                </button>
-                <ChatroomList onChatroomSelect={setSelectedChatroom} />
+            <div className="Sidebar flex flex-col bg-slate-600 w-1/3">
+                <div className="ActiveChats flex-grow bg-slate-600">
+                    <ChatroomList onChatroomSelect={setSelectedChatroom} />
+                </div>
+                <div className="Logout flex justify-center m-2">
+                    <button
+                        className="bg-slate-500 hover:bg-slate-700 text-white p-2 rounded-lg flex items-center justify-center mt-4"
+                        onClick={handleLogout}
+                    >
+                        Logout
+                    </button>
+                </div>
             </div>
 
             <div className="Conversations flex flex-col bg-slate-700 w-2/3 p-2">
@@ -120,7 +124,7 @@ const Chat = () => {
                     ) : (
                         <p>Select a chatroom to view messages</p>
                     )}
-                <div ref={messagesEndRef} />
+                    <div ref={messagesEndRef} />
                 </div>
                 <div className="InputArea flex gap-2 mt-2">
                     <input

@@ -24,9 +24,11 @@ const ChatroomList = ({ onChatroomSelect }) => {
                 } else {
                     console.error("Expected an array but got:", res.data);
                 }
-                
+
                 // Set the "main" chatroom as the default if it exists
-                const mainChatroom = res.data.find((chatroom) => chatroom.name === "main");
+                const mainChatroom = res.data.find(
+                    (chatroom) => chatroom.name === "main",
+                );
                 if (mainChatroom) {
                     onChatroomSelect(mainChatroom);
                 }
@@ -42,17 +44,52 @@ const ChatroomList = ({ onChatroomSelect }) => {
         }
     }, [user]);
 
+    const handleCreateChatroom = async () => {
+        try {
+            const res = await axios.post(
+                VITE_API_URL + "/api/chatrooms/create",
+                {
+                    chatroomName: "new room",
+                    userId: user._id,
+                },
+            );
+            setChatrooms([...chatrooms, res.data]); // Add the new chatroom to the list
+        } catch (error) {
+            console.error("Error creating chatroom:", error);
+        }
+    };
+
     return (
-        <div className="flex flex-col gap-4 m-2">
+        <div className="flex flex-col gap-4 m-2 p-2">
             {chatrooms.map((chatroom) => (
                 <button
                     key={chatroom._id}
-                    className="bg-slate-400 p-2 rounded-lg hover:bg-slate-500"
+                    className="bg-slate-400 hover:bg-slate-700 p-2 m-2 rounded-lg "
                     onClick={() => onChatroomSelect(chatroom)}
                 >
-                    <h3 className="text-lg font-semibold">{chatroom.name}</h3>
+                    {chatroom.name}
                 </button>
             ))}
+
+            <button
+                className="bg-slate-500 hover:bg-slate-700 text-white p-2 rounded-lg flex items-center justify-center mt-4"
+                onClick={handleCreateChatroom}
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="size-6"
+                >
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                    />
+                </svg>
+            </button>
         </div>
     );
 };

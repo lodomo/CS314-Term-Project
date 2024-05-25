@@ -164,6 +164,36 @@ app.post("/api/chatroom/:chatroomId/messages", async (req, res) => {
     }
 });
 
+// Endpoint to create a new chatroom
+app.post('/api/chatrooms/create', async (req, res) => {
+    const { chatroomName, userId } = req.body; // Expecting name and userId in the request body
+
+    try {
+        // Find the user by ID to set as admin
+        const adminUser = await User.findById(userId);
+
+        if (!adminUser) {
+            return res.status(404).json({ error: 'Admin user not found' });
+        }
+
+        // Create a new chatroom
+        const newChatroom = new Chatroom({
+            name: chatroomName,
+            admin: adminUser._id,
+            users: [adminUser._id], // Add the admin as the first user
+        });
+
+        // Save the chatroom to the database
+        const savedChatroom = await newChatroom.save();
+
+        res.status(201).json(savedChatroom);
+    } catch (error) {
+        console.error('Error creating chatroom:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
 const server = app.listen(PORT);
 console.log(`Server running at http://localhost:${PORT}/`);
 
