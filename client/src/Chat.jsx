@@ -1,6 +1,7 @@
 import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
+import { useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import ChatroomList from "./components/ChatroomList";
 import { useAuth } from "./context/AuthContext";
@@ -17,6 +18,7 @@ const Chat = () => {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
     const { user } = useAuth();
+    const messagesEndRef = useRef(null);
 
     const handleLogout = () => {
         // Clear the state and navigate to the login page
@@ -24,10 +26,18 @@ const Chat = () => {
     };
 
     useEffect(() => {
-        const ws = new WebSocket("ws://" + API_IP);
-        setWs(ws);
-        ws.addEventListener("message", handleMessage);
-    }, []);
+        const ws = new WebSocket(`ws://${API_IP}`);
+        ws.onmessage = async (event) => {
+            const message = JSON.parse(event.data);
+            if (message.chatroomId === selectedChatroom?._id) {
+                setMessages((prevMessages) => [...prevMessages, message]);
+            }
+        };
+
+        return () => {
+            ws.close();
+        };
+    }, [API_IP, selectedChatroom]);
 
     useEffect(() => {
         if (selectedChatroom) {
@@ -35,6 +45,12 @@ const Chat = () => {
             fetchMessages(selectedChatroom._id);
         }
     }, [selectedChatroom]);
+
+        useEffect(() => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [messages]);
 
     const fetchMessages = async (chatroomId) => {
         try {
@@ -52,15 +68,15 @@ const Chat = () => {
 
         try {
             const res = await axios.post(
-                `${import.meta.env.VITE_API_URL}/api/chatroom/${selectedChatroom._id}/messages`,
+                `${API_URL}/api/chatroom/${selectedChatroom._id}/messages`,
                 {
                     content: newMessage,
                     senderId: user._id,
                 },
             );
 
-            setMessages([...messages, res.data]);
-            setNewMessage("");
+            // The message will be broadcasted by the backend and handled in ws.onmessage
+            setNewMessage(""); // Clear the input after sending
         } catch (error) {
             console.error("Error sending message:", error);
         }
@@ -83,7 +99,7 @@ const Chat = () => {
             </div>
 
             <div className="Conversations flex flex-col bg-slate-700 w-2/3 p-2">
-                <div className="flex-grow bg-slate-400 p-2 rounded-lg">
+                <div className="MessagesContainer flex-grow overflow-y-auto h-64 bg-slate-400 p-2 rounded-lg scrollbar-thin">
                     {selectedChatroom ? (
                         <>
                             <h2 className="text-2xl font-bold mb-4">
@@ -93,7 +109,7 @@ const Chat = () => {
                                 {messages.map((message, index) => (
                                     <div
                                         key={index}
-                                        className="bg-white p-2 mb-2 rounded"
+                                        className="bg-white p-2 mb-2 rounded-lg"
                                     >
                                         <strong>{message.sender.name}:</strong>{" "}
                                         {message.content}
@@ -104,6 +120,7 @@ const Chat = () => {
                     ) : (
                         <p>Select a chatroom to view messages</p>
                     )}
+                <div ref={messagesEndRef} />
                 </div>
                 <div className="InputArea flex gap-2 mt-2">
                     <input
@@ -112,6 +129,9 @@ const Chat = () => {
                         className="bg-slate-500 flex-grow p-2 rounded-lg text-white text-bold"
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
+                        onKeyDown={(e) =>
+                            e.key === "Enter" && handleSendMessage()
+                        }
                     />
                     <button
                         className="bg-slate-400 p-2 rounded-lg"

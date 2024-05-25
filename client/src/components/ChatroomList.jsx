@@ -24,6 +24,12 @@ const ChatroomList = ({ onChatroomSelect }) => {
                 } else {
                     console.error("Expected an array but got:", res.data);
                 }
+                
+                // Set the "main" chatroom as the default if it exists
+                const mainChatroom = res.data.find((chatroom) => chatroom.name === "main");
+                if (mainChatroom) {
+                    onChatroomSelect(mainChatroom);
+                }
             } catch (error) {
                 console.error("Error fetching chatrooms:", error);
             }
