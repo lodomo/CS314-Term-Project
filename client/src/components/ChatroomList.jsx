@@ -6,6 +6,7 @@ const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const ChatroomList = ({ onChatroomSelect }) => {
     const [chatrooms, setChatrooms] = useState([]);
+    const [newRoomName, setNewRoomName] = useState("");
     const { user } = useAuth();
 
     useEffect(() => {
@@ -44,52 +45,69 @@ const ChatroomList = ({ onChatroomSelect }) => {
         }
     }, [user]);
 
-    const handleCreateChatroom = async () => {
+    const handleCreateChatroom = async (chatroomName) => {
+        console.log("Creating chatroom..."); // Debug log
         try {
             const res = await axios.post(
                 VITE_API_URL + "/api/chatrooms/create",
                 {
-                    chatroomName: "new room",
+                    chatroomName: chatroomName,
                     userId: user._id,
                 },
             );
             setChatrooms([...chatrooms, res.data]); // Add the new chatroom to the list
+            onChatroomSelect(res.data); // Select the new chatroom
         } catch (error) {
             console.error("Error creating chatroom:", error);
         }
     };
 
     return (
-        <div className="flex flex-col gap-4 m-2 p-2">
-            {chatrooms.map((chatroom) => (
-                <button
-                    key={chatroom._id}
-                    className="bg-slate-400 hover:bg-slate-700 p-2 m-2 rounded-lg "
-                    onClick={() => onChatroomSelect(chatroom)}
-                >
-                    {chatroom.name}
-                </button>
-            ))}
+        <div className="bg-slate-600 flex flex-col w-full p-2"> 
+            <div className="ChatroomList flex flex-col overflow-y-auto scrollbar-thin">
+                {chatrooms.map((chatroom) => (
+                    <button
+                        key={chatroom._id}
+                        className="bg-slate-400 hover:bg-slate-700 text-white p-2 m-1 rounded-lg flex items-center justify-center"
+                        onClick={() => onChatroomSelect(chatroom)}
+                    >
+                        {chatroom.name}
+                    </button>
+                ))}
+            </div>
 
-            <button
-                className="bg-slate-500 hover:bg-slate-700 text-white p-2 rounded-lg flex items-center justify-center mt-4"
-                onClick={handleCreateChatroom}
-            >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-6"
+            <div className="NewChatBox bg-slate-500 hover:bg-slate-700 text-white p-2 rounded-lg flex items-center justify-center mt-4">
+                <input
+                    type="text"
+                    placeholder="Create New Chat..."
+                    className="bg-slate-500 flex-grow p-2 mr-2 rounded-lg text-white text-bold"
+                    value={newRoomName}
+                    onChange={(e) => setNewRoomName(e.target.value)}
+                    onKeyDown={(e) =>
+                        e.key === "Enter" &&
+                        handleCreateChatroom(newRoomName.trim())
+                    }
+                />
+                <button
+                    className="AddChatButton"
+                    onClick={() => handleCreateChatroom(newRoomName.trim())}
                 >
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                    />
-                </svg>
-            </button>
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="size-6"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                        />
+                    </svg>
+                </button>
+            </div>
         </div>
     );
 };

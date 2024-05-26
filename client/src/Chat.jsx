@@ -89,15 +89,15 @@ const Chat = () => {
     return (
         <div className="flex h-screen">
             <div className="Sidebar flex flex-col bg-slate-600 w-1/3">
-                <div className="Logo w-3/4 justify-center mx-auto mt-4"> 
+                <div className="Logo w-3/4 justify-center mx-auto mt-4">
                     <img src="/full.svg" alt="logo" />
                 </div>
-               <div className="ActiveChats flex-grow bg-slate-600">
+                <div className="ActiveChats flex flex-grow w-full bg-slate-600 overflow-y-auto mx-auto">
                     <ChatroomList onChatroomSelect={setSelectedChatroom} />
                 </div>
-                <div className="Logout flex justify-center m-2">
+                <div className="Logout flex justify-center m-1">
                     <button
-                        className="bg-slate-500 hover:bg-slate-700 text-white p-2 rounded-lg flex items-center justify-center mt-4"
+                        className="bg-slate-500 hover:bg-slate-700 text-white p-2 rounded-lg flex items-center justify-center m-1"
                         onClick={handleLogout}
                     >
                         Logout
@@ -106,17 +106,19 @@ const Chat = () => {
             </div>
 
             <div className="Conversations flex flex-col bg-slate-700 w-2/3 p-2">
-                <div className="MessagesContainer flex-grow overflow-y-auto h-64 bg-slate-400 p-2 rounded-lg scrollbar-thin">
+                <div className="MessagesContainer flex flex-col flex-grow h-64 bg-slate-400 p-1 rounded-lg">
                     {selectedChatroom ? (
                         <>
-                            <h2 className="text-2xl font-bold mb-4">
-                                {selectedChatroom.name}
-                            </h2>
-                            <div>
+                            <div className="ChatroomHeader ">
+                                <div className="ChatroomName text-2xl font-bold p-2">
+                                    {selectedChatroom.name}
+                                </div>
+                            </div>
+                            <div className="overflow-y-auto scrollbar-thin">
                                 {messages.map((message, index) => (
                                     <div
                                         key={index}
-                                        className="bg-white p-2 mb-2 rounded-lg"
+                                        className="bg-white p-2 m-1 rounded-lg"
                                     >
                                         <strong>{message.sender.name}:</strong>{" "}
                                         {message.content}

@@ -71,5 +71,5 @@ Then clear out all the CSS delete App.css as its redundant, setup tailwind in th
 12) Added a way to add chatrooms.
     Chat rooms are all independant
 
-TODO add users to chatrooms. delete owned rooms.
-
+13) User can make chat rooms, and name them. Still need to make it so they can delete them,
+and add users
