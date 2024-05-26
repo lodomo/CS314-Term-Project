@@ -73,3 +73,8 @@ Then clear out all the CSS delete App.css as its redundant, setup tailwind in th
 
 13) User can make chat rooms, and name them. Still need to make it so they can delete them,
 and add users
+
+14) Admin to rooms have add and remove buttons now
+they do not do anything they are just buttons
+
+

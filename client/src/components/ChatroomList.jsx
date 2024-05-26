@@ -8,6 +8,7 @@ const ChatroomList = ({ onChatroomSelect }) => {
     const [chatrooms, setChatrooms] = useState([]);
     const [newRoomName, setNewRoomName] = useState("");
     const { user } = useAuth();
+    const [selectedChatroom, setSelectedChatroom] = useState(null); // Add this line
 
     useEffect(() => {
         console.log("ChatroomList component mounted"); // Verify component mount
@@ -26,12 +27,19 @@ const ChatroomList = ({ onChatroomSelect }) => {
                     console.error("Expected an array but got:", res.data);
                 }
 
-                // Set the "main" chatroom as the default if it exists
-                const mainChatroom = res.data.find(
-                    (chatroom) => chatroom.name === "main",
-                );
-                if (mainChatroom) {
-                    onChatroomSelect(mainChatroom);
+                // Set the first chatroom as selected if none is selected
+                if (!selectedChatroom && res.data.length > 0) {
+                    setSelectedChatroom(res.data[0]);
+                    onChatroomSelect(res.data[0]);
+                } else if (selectedChatroom) {
+                    // Update selected chatroom with new data
+                    const updatedChatroom = res.data.find(
+                        (room) => room._id === selectedChatroom._id,
+                    );
+                    if (updatedChatroom) {
+                        setSelectedChatroom(updatedChatroom);
+                        onChatroomSelect(updatedChatroom);
+                    }
                 }
             } catch (error) {
                 console.error("Error fetching chatrooms:", error);
@@ -63,7 +71,7 @@ const ChatroomList = ({ onChatroomSelect }) => {
     };
 
     return (
-        <div className="bg-slate-600 flex flex-col w-full p-2"> 
+        <div className="bg-slate-600 flex flex-col w-full p-2">
             <div className="ChatroomList flex flex-col overflow-y-auto scrollbar-thin">
                 {chatrooms.map((chatroom) => (
                     <button
