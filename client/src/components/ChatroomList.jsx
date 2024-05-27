@@ -63,8 +63,18 @@ const ChatroomList = ({ onChatroomSelect }) => {
                     userId: user._id,
                 },
             );
-            setChatrooms([...chatrooms, res.data]); // Add the new chatroom to the list
-            onChatroomSelect(res.data); // Select the new chatroom
+            const newChatroom = res.data;
+
+            // Add the new chatroom to the list
+            setChatrooms([...chatrooms, newChatroom]);
+
+            // Set the newly created chatroom as the selected one
+            setSelectedChatroom(newChatroom);
+
+            // Notify the parent component about the chatroom selection
+            onChatroomSelect(newChatroom);
+
+            console.log("New Chatroom:", newChatroom);
         } catch (error) {
             console.error("Error creating chatroom:", error);
         }
