@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
-const ChatroomList = ({ onChatroomSelect }) => {
+const ChatroomList = ({ onChatroomSelect, refresh}) => {
     const [chatrooms, setChatrooms] = useState([]);
     const [newRoomName, setNewRoomName] = useState("");
     const { user } = useAuth();
@@ -51,7 +51,7 @@ const ChatroomList = ({ onChatroomSelect }) => {
         } else {
             console.log("User or user._id is not defined"); // Debug log for missing user or user._id
         }
-    }, [user]);
+    }, [user, refresh]);
 
     const handleCreateChatroom = async (chatroomName) => {
         console.log("Creating chatroom..."); // Debug log
@@ -74,6 +74,8 @@ const ChatroomList = ({ onChatroomSelect }) => {
             // Notify the parent component about the chatroom selection
             onChatroomSelect(newChatroom);
 
+            // Clear the input field
+            setNewRoomName("");
             console.log("New Chatroom:", newChatroom);
         } catch (error) {
             console.error("Error creating chatroom:", error);

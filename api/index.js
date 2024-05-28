@@ -68,6 +68,25 @@ app.post("/api/login", async (req, res) => {
             await user.save();
 
             status_message = "New user created";
+
+            // Add the new user to the main chatroom
+            user = await User.findOne({ email });
+            const mainChatroom = await Chatroom.findOne({ name: "main" });
+            if (!mainChatroom.users.includes(user._id)) {
+                mainChatroom.users.push(user._id);
+                await mainChatroom.save();
+
+                // Join message
+                const message = new Message({
+                    content: "Joined the chat",
+                    sender: user,
+                    chatroom: mainChatroom._id,
+                });
+
+                console.log("User joined the chatroom");
+                console.log("User", user);
+                await message.save();
+            }
         } else {
             status_message = "User Logged In";
         }
@@ -81,18 +100,6 @@ app.post("/api/login", async (req, res) => {
     } catch (error) {
         console.error("Error processing user data:", error);
         res.status(500).json({ error: "Internal Server Error" });
-    }
-
-    // Make sure the user is added to the main chatroom
-    try {
-        let user = await User.findOne({ email });
-        const mainChatroom = await Chatroom.findOne({ name: "main" });
-        if (!mainChatroom.users.includes(user._id)) {
-            mainChatroom.users.push(user._id);
-            await mainChatroom.save();
-        }
-    } catch (error) {
-        console.error("Error adding user to main chatroom:", error);
     }
 });
 
@@ -126,7 +133,6 @@ app.get("/api/chatroom/:chatroomId/messages", async (req, res) => {
 });
 
 // New endpoint to create a message
-// New endpoint to create a message
 app.post("/api/chatroom/:chatroomId/messages", async (req, res) => {
     try {
         const { chatroomId } = req.params;
@@ -139,6 +145,12 @@ app.post("/api/chatroom/:chatroomId/messages", async (req, res) => {
         });
 
         const savedMessage = await message.save();
+
+        // Update the chatroom's messages array
+        await Chatroom.findByIdAndUpdate(chatroomId, {
+            $push: { messages: savedMessage._id }
+        });
+
         const populatedMessage = await Message.populate(savedMessage, {
             path: "sender",
             select: "name",
@@ -165,7 +177,7 @@ app.post("/api/chatroom/:chatroomId/messages", async (req, res) => {
 });
 
 // Endpoint to create a new chatroom
-app.post('/api/chatrooms/create', async (req, res) => {
+app.post("/api/chatrooms/create", async (req, res) => {
     const { chatroomName, userId } = req.body; // Expecting name and userId in the request body
 
     try {
@@ -173,7 +185,7 @@ app.post('/api/chatrooms/create', async (req, res) => {
         const adminUser = await User.findById(userId);
 
         if (!adminUser) {
-            return res.status(404).json({ error: 'Admin user not found' });
+            return res.status(404).json({ error: "Admin user not found" });
         }
 
         // Create a new chatroom
@@ -186,9 +198,79 @@ app.post('/api/chatrooms/create', async (req, res) => {
         // Save the chatroom to the database
         const savedChatroom = await newChatroom.save();
 
-        res.status(201).json(savedChatroom);
+        const retrieveSaved = await Chatroom.findById(savedChatroom._id)
+            .populate("users")
+            .populate("admin");
+
+        res.status(201).json(retrieveSaved);
     } catch (error) {
-        console.error('Error creating chatroom:', error);
+        console.error("Error creating chatroom:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+// Endpoint to get the list of all users
+app.get("/api/users", async (req, res) => {
+    try {
+        const users = await User.find({}, "_id name email");
+        res.status(200).json(users);
+    } catch (error) {
+        console.error("Error retrieving users:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+// Endpoint to add a user to a chatroom
+app.put("/api/chatrooms/:id/addUser", async (req, res) => {
+    const { id } = req.params;
+    const { userId } = req.body;
+
+    try {
+        const chatroom = await Chatroom.findById(id);
+
+        if (!chatroom) {
+            return res.status(404).json({ error: "Chatroom not found" });
+        }
+
+        if (!chatroom.users.includes(userId)) {
+            chatroom.users.push(userId);
+            await chatroom.save();
+
+            // Join message
+            const message = new Message({
+                content: "Joined the chat",
+                sender: userId,
+                chatroom: chatroom._id,
+            });
+            await message.save();
+        }
+
+        res.status(200).json(chatroom);
+    } catch (error) {
+        console.error("Error adding user to chatroom:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+app.delete('/api/chatrooms/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // Find the chatroom
+        const chatroom = await Chatroom.findById(id);
+        if (!chatroom) {
+            return res.status(404).json({ error: 'Chatroom not found' });
+        }
+
+        // Delete all messages associated with the chatroom
+        await Message.deleteMany({ chatroom: id });
+
+        // Delete the chatroom
+        await Chatroom.findByIdAndDelete(id);
+
+        res.status(200).json({ message: 'Chatroom and all associated messages deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting chatroom and messages:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
