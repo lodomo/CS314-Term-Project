@@ -1,8 +1,13 @@
 {
-  "dependencies": {
-    "@chakra-ui/react": "^2.8.2",
-    "@emotion/react": "^11.11.4",
-    "@emotion/styled": "^11.11.5",
-    "framer-motion": "^11.1.8"
-  }
+    "name": "messengern",
+    "version": "1.0.0",
+    "description": "Chat Application based on the MERN stack",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "client": "cd client && yarn dev",
+        "api": "cd api && npx nodemon index.js"
+    },
+    "author": "Lorenzo Moon / Josue Lopez",
+    "license": "ISC"
 }
