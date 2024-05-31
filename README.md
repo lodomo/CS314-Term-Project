@@ -6,18 +6,21 @@
 git clone https://github.com/lodomo/CS314-Term-Project
 ```
 
-2. Install the dependencies
+2. Run the Install Script 
 ```bash
-npm install
+cd CS314-Term-Project
+chmod a+x install.sh
+./install.sh  
 ```
 
 3. Create your environment variables 
-    a. In the "client" folder, create a .env file and add the following:
+    a. In the "client" folder, in the .env file and add the following:
     ```bash
     VITE_GOOGLE_CLIENT_ID="YOUR GOOGLE CLIENT ID"
     VITE_API_URL="YOUR API BACKEND URL HERE"
+    VITE_PORT="THE PORT YOU WANT TO RUN THE CLIENT ON"
     ```
-    b. In the "api" folder, create a .env file and add the following:
+    b. In the "api" folder, in the .env file and add the following:
     ```bash
     MONGO_URI="YOUR URI HERE"
     CLIENT_URL="YOUR CLIENT URL HERE"
@@ -36,6 +39,6 @@ npm install
     npx nodemon index.js
     ```
 
-5. Open the browser and go to http://localhost:3000
+5. Open the browser and go to http://localhost:"CLIENT PORT"
 
 6. Chat away!
